@@ -10,6 +10,7 @@
 using namespace std;
 
 #define die(s) { echo(s); return; }
+#define dief(s) { echo(s); return false;}
 
 class engine_t
 {
@@ -38,14 +39,7 @@ public:
         sai.sin_port = htons(port);
         sai.sin_addr.s_addr = type == "server" ? INADDR_ANY : inet_addr(ip.c_str());
 
-        if (type == "client")
-        {
-            echo("Connecting...");
-            if (connect(mysock, (sockaddr*)(&sai), sizeof(sai)) == SOCKET_ERROR)
-                die("Connect error!")
-                echo("Connection complete!");
-        }
-        else
+        if (type == "server")
         {
             if (bind(mysock, (sockaddr*)(&sai), sizeof(sai)) == SOCKET_ERROR)
                 die("Bind error");
@@ -54,12 +48,25 @@ public:
 		    if (listen(mysock, 1) == SOCKET_ERROR)
                 die("Listen error");
                 echo("Listen OK!");
-
+        }
+    }
+    bool connect()
+    {
+        if (type == "client")
+        {
+            echo("Connecting...");
+            if (::connect(mysock, (sockaddr*)(&sai), sizeof(sai)) == SOCKET_ERROR)
+                dief("Connect error!");
+                echo("Connection complete!");
+        }
+        else
+        {
             echo("Accepting...");
             if ((remsock = accept(mysock, NULL, NULL)) == INVALID_SOCKET)
-                die("Accept error!")
+                dief("Accept error!");
                 echo("Accepted!");
         }
+        return true;
     }
     ~engine_t() { closesocket(mysock); }
     bool write(const string &s)
