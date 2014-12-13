@@ -13,7 +13,7 @@ using namespace std;
 #define dief(s) { echo(s); return false;}
 
 /**
-@brief Универсальный класс работы с сокетами
+@brief Universal class for working with sockets
 */
 class engine_t
 {
@@ -26,28 +26,28 @@ class engine_t
 public:
 
     /**
-    @brief Выводит сообщение
-    @detailed Эту функцию можно перегрузить для разных способов вывода лога программы
-    @param s - сообщение
+    @brief Shows message
+    @detailed We can overload this function for another way of log-messaging
+    @param s - Message
     */
     void echo(const string &s) { cout << s << endl; }
 
     /**
-    @brief Инициализация подключения
-    @param mtype - тип приложения. Возможны только: "client" или "server"
-    @param ip - ip-адрес
-    @param port - порт
+    @brief Initialisation
+    @param mtype - Application type. It can be: "client" or "server"
+    @param ip - ip-address
+    @param port - port
     */
     engine_t(const string &mtype, const string &ip, int port)
     {
         type = mtype;
 
-        // Инициализация работы с сокетами
+        // Windows sockets initialisation
         if (WSAStartup(MAKEWORD(2, 0), &wsaData))
             die("Can't startup Windows Sockets");
             echo("Windows Sockets started");
 
-        // Создание TCP-сокета
+        // Creates a socket that is bound to a specific transport service provider
         if ((mysock = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP)) == INVALID_SOCKET)
             die("Can't create socket");
             echo("Socket Created");
@@ -59,12 +59,12 @@ public:
 
         if (type == "server")
         {
-            // Привязывание локального адреса к сокету
+            // Associates a local address with a socket
             if (bind(mysock, (sockaddr*)(&sai), sizeof(sai)) == SOCKET_ERROR)
                 die("Bind error");
                 echo("Bind OK!");
 
-            // Переводим сокет в режим ожидания входящих сообщений
+            // Places a socket in a state in which it is listening for an incoming connection
             if (listen(mysock, 1) == SOCKET_ERROR)
                 die("Listen error");
                 echo("Listen OK!");
@@ -72,7 +72,7 @@ public:
     }
 
     /**
-    @brief Подключение к клиенту/серверу для отправки сообщений
+    @brief Connects to client/server for chatting
     */
     bool connect()
     {
@@ -94,8 +94,8 @@ public:
     }
 
     /**
-    @brief Отправка сообщения
-    @param s - сообщение
+    @brief Sends message
+    @param s - message
     */
     bool write(const string &s)
     {
@@ -108,8 +108,8 @@ public:
     }
 
     /**
-    @brief Получение сообщения
-    @param s - сообщение
+    @brief Gets message
+    @param s - message
     */
     bool read(string &s)
     {
@@ -122,8 +122,8 @@ public:
     }
 
     /**
-    @brief Деструктор
-    @detailed Закрывает сокеты
+    @brief Destructor
+    @detailed Closes sockets
     */
     ~engine_t() { closesocket(mysock); }
 };
