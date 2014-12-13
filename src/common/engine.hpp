@@ -45,7 +45,7 @@ public:
                 die("Bind error");
                 echo("Bind OK!");
 
-		    if (listen(mysock, 1) == SOCKET_ERROR)
+            if (listen(mysock, 1) == SOCKET_ERROR)
                 die("Listen error");
                 echo("Listen OK!");
         }
