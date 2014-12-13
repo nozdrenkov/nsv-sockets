@@ -12,6 +12,9 @@ using namespace std;
 #define die(s) { echo(s); return; }
 #define dief(s) { echo(s); return false;}
 
+/**
+@brief Универсальный класс работы с сокетами
+*/
 class engine_t
 {
     string type;
@@ -21,15 +24,30 @@ class engine_t
     sockaddr_in sai;
     char buf[2000000];
 public:
+
+    /**
+    @brief Выводит сообщение
+    @detailed Эту функцию можно перегрузить для разных способов вывода лога программы
+    @param s - сообщение
+    */
     void echo(const string &s) { cout << s << endl; }
+
+    /**
+    @brief Инициализация подключения
+    @param mtype - тип приложения. Возможны только: "client" или "server"
+    @param ip - ip-адрес
+    @param port - порт
+    */
     engine_t(const string &mtype, const string &ip, int port)
     {
         type = mtype;
 
+        // Инициализация работы с сокетами
         if (WSAStartup(MAKEWORD(2, 0), &wsaData))
             die("Can't startup Windows Sockets");
             echo("Windows Sockets started");
 
+        // Создание TCP-сокета
         if ((mysock = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP)) == INVALID_SOCKET)
             die("Can't create socket");
             echo("Socket Created");
@@ -41,15 +59,21 @@ public:
 
         if (type == "server")
         {
+            // Привязывание локального адреса к сокету
             if (bind(mysock, (sockaddr*)(&sai), sizeof(sai)) == SOCKET_ERROR)
                 die("Bind error");
                 echo("Bind OK!");
 
+            // Переводим сокет в режим ожидания входящих сообщений
             if (listen(mysock, 1) == SOCKET_ERROR)
                 die("Listen error");
                 echo("Listen OK!");
         }
     }
+
+    /**
+    @brief Подключение к клиенту/серверу для отправки сообщений
+    */
     bool connect()
     {
         if (type == "client")
@@ -68,7 +92,11 @@ public:
         }
         return true;
     }
-    ~engine_t() { closesocket(mysock); }
+
+    /**
+    @brief Отправка сообщения
+    @param s - сообщение
+    */
     bool write(const string &s)
     {
         int len = s.size();
@@ -78,6 +106,11 @@ public:
         int f2 = send(to, buf, len + 1, NULL);
         return f1 == sizeof(int) && f2 == len + 1;
     }
+
+    /**
+    @brief Получение сообщения
+    @param s - сообщение
+    */
     bool read(string &s)
     {
         int len = 0;
@@ -87,6 +120,12 @@ public:
         s = string(buf);
         return f1 == sizeof(int) && f2 == len + 1;
     }
+
+    /**
+    @brief Деструктор
+    @detailed Закрывает сокеты
+    */
+    ~engine_t() { closesocket(mysock); }
 };
 
 #endif
