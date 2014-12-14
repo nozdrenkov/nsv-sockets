@@ -3,10 +3,10 @@
 #pragma comment(lib, "WS2_32.lib")
 #pragma comment(linker, "/STACK:36777216")
 
+#include <WinSock2.h>
 #include <iostream>
 #include <string>
 #include <cstring>
-#include <WinSock2.h>
 using namespace std;
 
 #define die(s) { echo(s); return; }
