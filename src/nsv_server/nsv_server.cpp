@@ -1,5 +1,9 @@
 #include "../common/engine.hpp"
 #include <sstream>
+#include <fstream>
+#include <cstdio>
+#include <Windows.h>
+#include "dirent.h"
 using namespace std;
 
 /**
@@ -82,12 +86,24 @@ public:
     }
 
     /**
-    @brief Shows files in directory dir
+    @brief Shows files in directory s
     */
-    void show(const string &dir)
+    void show(const string &s)
     {
         ostringstream os;
-        os << "blabla = " << 0 << endl;
+        os << "FILES:" << endl;
+
+        DIR *dir;
+        struct dirent *ent;
+        if (dir = opendir(s.c_str()))
+        {
+            while (ent = readdir(dir))
+                os << string(ent->d_name) << endl;
+            closedir(dir);
+        }
+        else
+            os << "ERROR!" << endl;
+
         engine->write(os.str());
     }
 
@@ -96,6 +112,15 @@ public:
     */
     void rename(const string &file, const string &new_name)
     {
+        ostringstream os;
+        os << "RENAME" << endl;
+        os << "file: " << file << endl;
+        os << "new name: " << new_name << endl;
+        if (::rename(file.c_str(), new_name.c_str()) == 0)
+            os << "SUCCESS!";
+        else
+            os << "FAIL! :(";
+        engine->write(os.str());
     }
 
     /**
@@ -103,6 +128,17 @@ public:
     */
     void copy(const string &from, const string &to)
     {
+        ostringstream os;
+        os << "COPY" << endl;
+        os << "from: " << from << endl;
+        os << "to: " << to << endl;
+
+        ifstream  src(from, std::ios::binary);
+        ofstream  dst(to,   std::ios::binary);
+        dst << src.rdbuf();
+
+        os << "Finish" << endl;
+        engine->write(os.str());
     }
 
     /**
@@ -110,6 +146,16 @@ public:
     */
     void remove(const string &file)
     {
+        ostringstream os;
+        os << "REMOVE" << endl;
+        os << "file: " << file << endl;
+        
+        if (::remove(file.c_str()) == 0)
+            os << "SUCCESS!";
+        else
+            os << "FAIL! :(";
+
+        engine->write(os.str());
     }
 
     /**
@@ -117,6 +163,16 @@ public:
     */
     void exec(const string &file)
     {
+        ostringstream os;
+        os << "EXEC" << endl;
+        os << "file: " << file << endl;
+
+        if (WinExec(file.c_str(), 1) > 31)
+            os << "SUCCESS!";
+        else
+            os << "FAIL! :(";
+
+        engine->write(os.str());
     }
 
     /**
