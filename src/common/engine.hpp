@@ -125,7 +125,11 @@ public:
     @brief Destructor
     @detailed Closes sockets
     */
-    ~engine_t() { closesocket(mysock); }
+    ~engine_t()
+    {
+        closesocket(mysock);
+        WSACleanup();
+    }
 };
 
 #endif
