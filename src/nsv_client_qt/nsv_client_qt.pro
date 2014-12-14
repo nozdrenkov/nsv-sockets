@@ -1,10 +1,12 @@
 #-------------------------------------------------
 #
-# Project created by QtCreator 2014-12-14T23:26:57
+# Project created by QtCreator 2014-12-14T23:34:47
 #
 #-------------------------------------------------
 
-QT       += core gui
+QT += core gui
+QT += webkit
+QT += webkit webkitwidgets
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
